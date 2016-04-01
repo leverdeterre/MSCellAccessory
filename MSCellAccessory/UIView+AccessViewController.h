@@ -38,12 +38,12 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UIView (AccessViewController)
-- (UIViewController *)viewController DEPRECATED_ATTRIBUTE;
+@interface UIResponder (AccessViewController)
+
 // Thanks to Phil M
 // http://stackoverflow.com/questions/1340434/get-to-uiviewcontroller-from-uiview-on-iphone
-- (UIViewController *)ms_firstAvailableUIViewController;
-- (id)ms_traverseResponderChainForUIViewController;
+- (UIViewController *)ms_firstAvailableViewController;
+- (UIViewController *)ms_firstAvailableViewControllerRespondingToSelector:(SEL)selector;
 
 - (UITableView *)ms_firstTableViewHierarchyFromView:(UIView *)view;
 - (UITableViewCell *)ms_firstTableViewCellInHierarchyFromView:(UIView *)view;

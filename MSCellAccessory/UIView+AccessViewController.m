@@ -8,31 +8,7 @@
 
 #import "UIView+AccessViewController.h"
 
-@implementation UIView (AccessViewController)
-- (UIViewController *)viewController;
-{
-    id nextResponder = [self nextResponder];
-    if ([nextResponder isKindOfClass:[UIViewController class]]) {
-        return nextResponder;
-    } else {
-        return nil;
-    }
-}
-- (UIViewController *)ms_firstAvailableUIViewController {
-    // convenience function for casting and to "mask" the recursive function
-    return (UIViewController *)[self ms_traverseResponderChainForUIViewController];
-}
-
-- (id)ms_traverseResponderChainForUIViewController {
-    id nextResponder = [self nextResponder];
-    if ([nextResponder isKindOfClass:[UIViewController class]]) {
-        return nextResponder;
-    } else if ([nextResponder isKindOfClass:[UIView class]]) {
-        return [nextResponder ms_traverseResponderChainForUIViewController];
-    } else {
-        return nil;
-    }
-}
+@implementation UIResponder (AccessViewController)
 
 - (UITableView *)ms_firstTableViewHierarchyFromView:(UIView *)view
 {
@@ -58,6 +34,40 @@
     }
     
     return nil;
+}
+
+- (UIViewController *)ms_firstAvailableViewController
+{
+    // convenience function for casting and to "mask" the recursive function
+    return (UIViewController *)[self ms_traverseResponderChainForViewControllerRespondingToSelector:NULL];
+}
+
+- (UIViewController *)ms_firstAvailableViewControllerRespondingToSelector:(SEL)selector
+{
+    return [self ms_traverseResponderChainForViewControllerRespondingToSelector:selector];
+}
+
+#pragma mark - Private
+
+- (UIViewController *)ms_traverseResponderChainForViewControllerRespondingToSelector:(SEL)selector
+{
+    id nextResponder = [self nextResponder];
+    if ([nextResponder isKindOfClass:UIViewController.class]) {
+        UIViewController *viewController = (UIViewController *)nextResponder;
+        if (NULL == selector) {
+            return viewController;
+            
+        } else {
+            if([viewController respondsToSelector:selector]){
+                return viewController;
+                
+            } else if ([viewController.parentViewController respondsToSelector:selector]){
+                return viewController.parentViewController;
+            }
+        }
+    }
+    
+    return [nextResponder ms_traverseResponderChainForViewControllerRespondingToSelector:selector];
 }
 
 @end
